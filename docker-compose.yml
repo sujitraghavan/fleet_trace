@@ -1,0 +1,46 @@
+version: "3.8"
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: uvicorn backend.app:app --host 0.0.0.0 --port 8000
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "8000:8000"
+    environment:
+      OSRM_HOST: osrm
+      OSRM_PORT: 5000
+    depends_on:
+      - redis
+      - osrm
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  osrm:
+    image: osrm/osrm-backend:latest
+    command: osrm-routed --algorithm mld /data/graph-cache/paraguay-latest.osrm
+    volumes:
+      - ./data/graph-cache:/data/graph-cache
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: celery -A backend.tasks worker --loglevel=info
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - redis
+      - osrm

@@ -1,0 +1,17 @@
+# Python artefacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+# VSCode settings
+.vscode/
+# Node modules
+node_modules/
+# Build outputs
+frontend/dist/
+# Runtime data (generated trips, OSRM tiles)
+data/
+# OSRM tiles (large)
+data/graph-cache/
+# IDE specific
+.idea/

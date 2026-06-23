@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+pydantic
+celery[redis]
+httpx
+structlog
+prometheus-client
+ruff
+black
